@@ -1,91 +1,21 @@
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const { PluginLoader } = require('musicfree');
+import express from "express";
+import cors from "cors";  // 如果你的项目有跨域需求，可以使用这个
 
 const app = express();
-app.use(cors());
+const port = process.env.PORT || 3000;  // Render 会自动传递 PORT 环境变量，如果没有设置就使用默认的 3000
+
+// 中间件：解析 JSON 请求体
 app.use(express.json());
+app.use(cors());  // 允许跨域请求
 
-// 自动加载 plugins 目录下所有插件
-const loader = new PluginLoader();
-const pluginDir = path.join(__dirname, 'plugins');
-
-fs.readdirSync(pluginDir).forEach(file => {
-  if (file.endsWith('.js')) {
-    const pluginPath = path.join(pluginDir, file);
-    loader.addPluginFromLocal(pluginPath);
-  }
+// 你的路由配置
+app.get("/", (req, res) => {
+  res.send("Hello, welcome to your Render-deployed app!");
 });
 
-loader.load();
+// 在这里添加其他 API 路由
 
-loader.ready().then(() => {
-  console.log('🎵 所有插件已加载完毕');
-  const plugins = loader.getPlugins();
-
-  function getPluginByName(name) {
-    return plugins.find(p => p.name === name);
-  }
-
-  app.get('/search', async (req, res) => {
-    const keyword = req.query.q || '';
-    const results = [];
-
-    for (const plugin of plugins) {
-      try {
-        const r = await plugin.search(keyword);
-        results.push({ source: plugin.name, data: r });
-      } catch (e) {
-        results.push({ source: plugin.name, error: e.message });
-      }
-    }
-
-    res.json(results);
-  });
-
-  app.get('/playurl', async (req, res) => {
-    const { id, source } = req.query;
-    const plugin = getPluginByName(source);
-    if (!plugin) return res.status(404).send('Plugin not found');
-
-    try {
-      const url = await plugin.getPlayableUrl(id);
-      res.json({ url });
-    } catch (e) {
-      res.status(500).send(e.message);
-    }
-  });
-
-  app.get('/lyric', async (req, res) => {
-    const { id, source } = req.query;
-    const plugin = getPluginByName(source);
-    if (!plugin) return res.status(404).send('Plugin not found');
-
-    try {
-      const lyric = await plugin.getLyric(id);
-      res.json(lyric);
-    } catch (e) {
-      res.status(500).send(e.message);
-    }
-  });
-
-  app.get('/playlist', async (req, res) => {
-    const { id, source } = req.query;
-    const plugin = getPluginByName(source);
-    if (!plugin) return res.status(404).send('Plugin not found');
-
-    try {
-      const playlist = await plugin.getPlaylistDetail(id);
-      res.json(playlist);
-    } catch (e) {
-      res.status(500).send(e.message);
-    }
-  });
-
-  const PORT = 3000;
-  app.listen(PORT, () => {
-    console.log(`🚀 MusicFree 后端服务启动成功：http://localhost:${PORT}`);
-  });
+// 启动服务器
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
