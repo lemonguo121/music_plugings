@@ -1,5 +1,5 @@
 import express from 'express';
-import { searchMusic, getLyric, getTopLists, getTopListDetail } from './plugins/aiting2bygtp.js'; // 根据需要调整路径
+import { searchMusic, getLyric, getTopLists, getTopListDetail,getMediaSource } from './plugins/aiting2bygtp.js'; // 根据需要调整路径
 
 const app = express();
 const port = process.env.PORT || 10000;
@@ -44,6 +44,20 @@ app.get('/lyric', async (req, res) => {
 });
 
 // 其他路由根据需要添加...
+app.get('/getMediaSource', async (req, res) => {
+    const musicId = req.query.id;
+    if (!musicId) {
+        return res.status(400).json({ error: '必须提供歌曲 ID' });
+    }
+
+    try {
+        const musicItem = { id: musicId };
+        const media = await getMediaSource(musicItem);
+        res.json(media);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // 启动服务器
 app.listen(port, () => {
