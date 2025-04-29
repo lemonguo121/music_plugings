@@ -117,6 +117,48 @@ app.get('/getPlugins', (req, res) => {
     }
 });
 
+//获取榜单
+app.get('/getTopLists',async(req,res)=>{
+    const { id, plugin: pluginName } = req.query;
+        if (!id || !pluginName) {
+            return res.status(400).json({ error: '必须提供榜单ID 和插件名' });
+        }
+          try {
+                const plugin = plugins[pluginName];
+                if (plugin) {
+                    const musicItem = { id };
+                    const topic = await plugin.getTopLists();
+                    res.json(topic);
+                } else {
+                    res.status(404).json({ error: `插件 ${pluginName} 未找到` });
+                }
+            } catch (error) {
+                res.status(500).json({ error: error.message });
+            }
+})
+
+//获取榜单详情
+app.get('/getTopListDetail', async (req, res) => {
+    const { id, plugin: pluginName } = req.query;
+
+    if (!id || !pluginName) {
+        return res.status(400).json({ error: '必须提供榜单 ID 和插件名' });
+    }
+
+    try {
+        const plugin = plugins[pluginName];
+        if (plugin && plugin.getTopListDetail) {
+            const topListItem = { id };
+            const detail = await plugin.getTopListDetail(topListItem);
+            res.json(detail);
+        } else {
+            res.status(404).json({ error: `插件 ${pluginName} 未找到，或者没有实现 getTopListDetail` });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // 启动服务器
 app.listen(port, () => {
     console.log(`服务器正在运行，端口号: ${port}`);
