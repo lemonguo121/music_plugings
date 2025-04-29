@@ -54,6 +54,48 @@ export async function searchMusic(query, page = 1) {
         data: songList.map(formatMusicItem)
     };
 }
+
+/** 搜索专辑（未实现） */
+export async function searchAlbum(query, page = 1) {
+    return {
+        isEnd: true,
+        data: []  // zz123 暂无专辑接口实现
+    };
+}
+
+/** 搜索歌手 */
+export async function searchArtist(query, page = 1) {
+    const data = await searchBase(query);
+    return {
+        isEnd: true,
+        data: data
+            .filter(item => item.sname?.includes(query))
+            .map(formatMusicItem)
+    };
+}
+
+/** 搜索歌单（暂未提供，返回空） */
+export async function searchMusicSheet(query, page = 1) {
+    return {
+        isEnd: true,
+        data: []
+    };
+}
+/** 多类型搜索分发器 */
+export async function searchBase(query, page, type) {
+    switch (type) {
+        case "music":
+            return searchMusic(query, page);
+        case "album":
+            return searchAlbum(query, page);
+        case "artist":
+            return searchArtist(query, page);
+        case "sheet":
+            return searchMusicSheet(query, page);
+        default:
+            return { isEnd: true, data: [] };
+    }
+}
 /** 获取音频播放链接 */
 export async function getMediaSource(musicItem, quality = "standard") {
     const headers = {

@@ -45,7 +45,7 @@ app.use((req, res, next) => {
 
 // 搜索音乐
 app.get('/search', async (req, res) => {
-    const { query, page = 1, plugin: pluginName } = req.query;
+    const { query,type ='music', page = 1, plugin: pluginName } = req.query;
 
     if (!query || !pluginName) {
         return res.status(400).json({ error: '必须提供查询参数和插件名' });
@@ -54,7 +54,7 @@ app.get('/search', async (req, res) => {
     try {
         const plugin = plugins[pluginName];
         if (plugin) {
-            const result = await plugin.searchMusic(query, page);
+            const result = await plugin.searchBase(query, page,type);
             res.json(result);
         } else {
             res.status(404).json({ error: `插件 ${pluginName} 未找到` });
