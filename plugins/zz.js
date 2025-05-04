@@ -42,50 +42,58 @@ async function fetchHtml(params = {}) {
     return response.data;
 }
 
-/** 通用搜索请求 */
-async function searchBase(query) {
-    const res = await fetchHtml({ act: "search", key: query, lang: "" });
-    return res.data || [];
-}
-
-/** 搜索歌曲 */
+/** 搜索音乐 */
 export async function searchMusic(query, page = 1) {
-    const data = await searchBase(query);
+    const res = await fetchHtml({ act: "search", key: query, lang: "" });
     return {
         isEnd: true,
-        data: data.map(formatMusicItem)
+        data: (res.data || []).map(formatMusicItem)
     };
 }
 
-/** 搜索专辑（未实现） */
+/** 搜索专辑 */
 export async function searchAlbum(query, page = 1) {
+    const res = await fetchHtml({ act: "search", key: query, lang: "", type: "album" });
     return {
         isEnd: true,
-        data: []  // zz123 暂无专辑接口实现
+        data: (res.data || []).map(item => ({
+            id: item.id,
+            platform: "种子",
+            title: item.mname,
+            artwork: item.pic
+        }))
     };
 }
 
-/** 搜索歌手 */
+/** 搜索艺术家 */
 export async function searchArtist(query, page = 1) {
-    const data = await searchBase(query);
+    const res = await fetchHtml({ act: "search", key: query, lang: "", type: "artist" });
     return {
         isEnd: true,
-        data: data
-            .filter(item => item.sname?.includes(query))
-            .map(formatMusicItem)
+        data: (res.data || []).map(item => ({
+            id: item.id,
+            platform: "种子",
+            artist: item.sname
+        }))
     };
 }
 
-/** 搜索歌单（暂未提供，返回空） */
+/** 搜索歌单 */
 export async function searchMusicSheet(query, page = 1) {
+    const res = await fetchHtml({ act: "search", key: query, lang: "", type: "sheet" });
     return {
         isEnd: true,
-        data: []
+        data: (res.data || []).map(item => ({
+            id: item.id,
+            platform: "种子",
+            title: item.mname,
+            description: item.desc
+        }))
     };
 }
 
 /** 多类型搜索分发器 */
-export async function searchDispatcher(query, page, type) {
+export async function searchBase(query, page, type) {
     switch (type) {
         case "music":
             return searchMusic(query, page);
@@ -163,10 +171,11 @@ export async function getTopListDetail(topListItem) {
         musicList: data.map(formatMusicItem)
     };
 }
-/*获取当前插件名字*/
+
+/* 获取当前插件名字 */
 export async function getPluginName(topListItem) {
     return {
-       name:"种子",
-       platform:"zz"
+       name: "种子",
+       platform: "zz"
     };
 }

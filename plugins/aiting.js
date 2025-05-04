@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 import he from "he"; // 虽然没有用到，但可以保留
 
 const host = "http://www.2t58.com";
+const PLATFORM = "aiting";
 
 /** 提取搜索结果 */
 async function parseSearchResults(raw_data, separator) {
@@ -21,7 +22,7 @@ async function parseSearchResults(raw_data, separator) {
         const artist = separatedText[0];
         const title = separatedText[1] || separatedText[2] || "";
 
-        list.push({ id, title, artist });
+        list.push({ id, title, artist, platform: PLATFORM });
     }
 
     return list;
@@ -35,7 +36,8 @@ function formatMusicItem(item) {
         title: item.title,
         album: item.album,
         duration: item.duration,
-        artwork: item.artwork
+        artwork: item.artwork,
+        platform:PLATFORM
     };
 }
 
@@ -176,7 +178,8 @@ export async function getTopListDetail(topListItem) {
         songList = songList.map(item => ({
             id: item.id,
             title: item.title,
-            artist: item.artist
+            artist: item.artist,
+            platform:PLATFORM
         }));
 
         musicList = musicList.concat(songList);
@@ -191,6 +194,6 @@ export async function getTopListDetail(topListItem) {
 export async function getPluginName(topListItem) {
     return {
        name:"爱听",
-       platform:"aiting"
+       platform:PLATFORM
     };
 }
