@@ -3,7 +3,7 @@ import * as cheerio from "cheerio";
 import he from "he"; // 虽然没有用到，但可以保留
 
 const host = "http://www.2t58.com";
-const PLATFORM = "爱听";
+const PLATFORM = "aiting";
 
 /** 提取搜索结果 */
 async function parseSearchResults(raw_data, separator) {
