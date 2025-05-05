@@ -3,7 +3,7 @@ import * as cheerio from "cheerio";
 import he from "he"; // 保留未使用
 
 const host = "https://zz123.com";
-
+const PLATFORM = "种子";
 /** 秒数转换工具 */
 function timeToSeconds(timeStr) {
     try {
@@ -20,7 +20,7 @@ function timeToSeconds(timeStr) {
 function formatMusicItem(item) {
     return {
         id: item.id,
-        platform: "种子",
+        platform: PLATFORM,
         artist: item.sname,
         title: item.mname,
         album: item.pic,
@@ -58,7 +58,7 @@ export async function searchAlbum(query, page = 1) {
         isEnd: true,
         data: (res.data || []).map(item => ({
             id: item.id,
-            platform: "种子",
+            platform: PLATFORM,
             title: item.mname,
             artwork: item.pic
         }))
@@ -72,7 +72,7 @@ export async function searchArtist(query, page = 1) {
         isEnd: true,
         data: (res.data || []).map(item => ({
             id: item.id,
-            platform: "种子",
+            platform: PLATFORM,
             artist: item.sname
         }))
     };
@@ -85,7 +85,7 @@ export async function searchMusicSheet(query, page = 1) {
         isEnd: true,
         data: (res.data || []).map(item => ({
             id: item.id,
-            platform: "种子",
+            platform: PLATFORM,
             title: item.mname,
             description: item.desc
         }))
