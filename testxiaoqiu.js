@@ -1,13 +1,19 @@
 // testxiaoqiu.js
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
+import { pluginInstance as xiaoqiu } from './test/xiaoqiu1.js';
 
-// 引入插件
-const plugin = require('./plugins/xiaoqiu.js'); // 改为你自己的插件文件路径
+(async () => {
+  const res = await xiaoqiu.searchBase('周杰伦', 1, 'music');
+  console.log("搜索结果：", res.data?.slice(0, 1));
 
-async function test() {
-  const result = await plugin.search('周杰伦');
-  console.log('搜索结果：', result);
-}
+  const item = res.data?.[0];
+  if (item) {
+    const lyric = await xiaoqiu.getLyric(item);
+    console.log("歌词预览：", lyric.rawLrc?.slice(0, 50));
 
-test();
+    const res = await xiaoqiu.getMediaSource(item);
+    console.log("地址", res.url);
+  }
+
+  const pluginInfo = await xiaoqiu.getPluginName();
+  console.log("插件信息：", pluginInfo);
+})();
